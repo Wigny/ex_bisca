@@ -3,7 +3,7 @@ defmodule ExBisca.Deck.Card do
 
   defguard is_trump(trump, card) when card.suit == trump.suit
 
-  typedstruct enforce: true do
+  typedstruct do
     field :rank, 2 | 3 | 4 | 5 | 6 | 7 | :queen | :jack | :king | :ace
     field :suit, :spades | :hearts | :diamonds | :clubs
   end
@@ -38,8 +38,14 @@ defmodule ExBisca.Deck.Card do
 
   defimpl Inspect do
     def inspect(card, _opts) do
-      Enum.join(["#Card<", card.rank, suit(card.suit), ">"])
+      Enum.join(["#Card<", rank(card.rank), suit(card.suit), ">"])
     end
+
+    defp rank(:queen), do: "Q"
+    defp rank(:jack), do: "J"
+    defp rank(:king), do: "K"
+    defp rank(:ace), do: "A"
+    defp rank(rank), do: rank
 
     defp suit(:spades), do: "\u2660"
     defp suit(:hearts), do: "\u2665"
