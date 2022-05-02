@@ -31,7 +31,7 @@ defmodule ExBisca.Play.Round do
 
   def winner(round, trump) do
     max_card = round.stack |> Map.values() |> Enum.max(&Card.captures?(&1, &2, trump))
-    {winner, _max_card} = Enum.find(round.stack, &match?({_, ^max_card}, &1))
+    {winner, ^max_card} = Enum.find(round.stack, &match?({_, ^max_card}, &1))
 
     winner
   end
@@ -40,7 +40,7 @@ defmodule ExBisca.Play.Round do
     players = Map.keys(round.stack)
     index = Enum.find_index(players, &(&1 == round.current_player))
 
-    Enum.at(players, index + 1)
+    Enum.at(players, index + 1) || List.first(players)
   end
 
   def score(round) do
