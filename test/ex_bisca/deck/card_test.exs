@@ -35,20 +35,20 @@ defmodule ExBisca.Deck.CardTest do
       %{trump: %Card{rank: 3, suit: :hearts}}
     end
 
-    test "if they are of the same suit", %{trump: trump} do
+    test "when they are of the same suit", %{trump: trump} do
       assert Card.gt?(%Card{rank: 5, suit: :diamonds}, %Card{rank: 2, suit: :diamonds}, trump)
       assert Card.gt?(%Card{rank: :king, suit: :spades}, %Card{rank: 6, suit: :spades}, trump)
       assert Card.gt?(%Card{rank: :ace, suit: :hearts}, %Card{rank: 7, suit: :hearts}, trump)
       refute Card.gt?(%Card{rank: :jack, suit: :clubs}, %Card{rank: 7, suit: :clubs}, trump)
     end
 
-    test "if they are of different suits and there is no trump card between them", %{trump: trump} do
+    test "when they are of different suits and there is no trump between them", %{trump: trump} do
       assert Card.gt?(%Card{rank: 2, suit: :diamonds}, %Card{rank: 3, suit: :clubs}, trump)
       assert Card.gt?(%Card{rank: 7, suit: :spades}, %Card{rank: :ace, suit: :diamonds}, trump)
       assert Card.gt?(%Card{rank: :jack, suit: :clubs}, %Card{rank: :king, suit: :spades}, trump)
     end
 
-    test "if they are of different suits and there is a trump card between them", %{trump: trump} do
+    test "when they are of different suits and there is a trump between them", %{trump: trump} do
       assert Card.gt?(%Card{rank: 2, suit: trump.suit}, %Card{rank: 3, suit: :clubs}, trump)
       refute Card.gt?(%Card{rank: 7, suit: :spades}, %Card{rank: 2, suit: trump.suit}, trump)
       assert Card.gt?(%Card{rank: 5, suit: trump.suit}, %Card{rank: 6, suit: :spades}, trump)
