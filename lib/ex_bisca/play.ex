@@ -63,9 +63,9 @@ defmodule ExBisca.Play do
   end
 
   defp prepare_next_move(play) do
-    round_incomplete? = Enum.any?(play.round.stack, &match?({_player, nil}, &1))
-
-    if round_incomplete?, do: prepare_next_round_move(play), else: prepare_next_round(play)
+    if Round.complete?(play.round),
+      do: prepare_next_round(play),
+      else: prepare_next_round_move(play)
   end
 
   defp prepare_next_round_move(play) do

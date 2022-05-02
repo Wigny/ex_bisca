@@ -12,7 +12,7 @@ defmodule ExBisca.PlayTest do
              },
              round: %Play.Round{
                current_player: :player_1,
-               stack: %{player_1: nil, player_2: nil}
+               stack: [player_1: nil, player_2: nil]
              },
              trump: _trump
            } = Play.start([:player_1, :player_2])
@@ -80,7 +80,7 @@ defmodule ExBisca.PlayTest do
         },
         round: %ExBisca.Play.Round{
           current_player: :player_1,
-          stack: %{player_1: nil, player_2: nil}
+          stack: [player_1: nil, player_2: nil]
         },
         trump: %Card{rank: :ace, suit: :diamonds}
       }
@@ -95,7 +95,7 @@ defmodule ExBisca.PlayTest do
                },
                round: %ExBisca.Play.Round{
                  current_player: :player_2,
-                 stack: %{player_1: %Card{rank: :king, suit: :clubs}, player_2: nil}
+                 stack: [player_1: %Card{rank: :king, suit: :clubs}, player_2: nil]
                }
              } = Play.move(play, :player_1, %Card{rank: :king, suit: :clubs})
     end
@@ -110,7 +110,7 @@ defmodule ExBisca.PlayTest do
                },
                round: %ExBisca.Play.Round{
                  current_player: :player_1,
-                 stack: %{player_1: nil, player_2: nil}
+                 stack: [player_1: nil, player_2: nil]
                }
              } = Play.move(play, :player_2, %Card{rank: 2, suit: :clubs})
     end
