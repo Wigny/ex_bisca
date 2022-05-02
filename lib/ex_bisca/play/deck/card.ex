@@ -1,4 +1,4 @@
-defmodule ExBisca.Deck.Card do
+defmodule ExBisca.Play.Deck.Card do
   use TypedStruct
 
   typedstruct do
@@ -14,9 +14,9 @@ defmodule ExBisca.Deck.Card do
   def score(%{rank: :ace}), do: 11
   def score(_card), do: 0
 
-  @spec gt?(t, t, t) :: boolean
+  @spec captures?(t, t, t) :: boolean
 
-  def gt?(card1, card2, _trump) when card1.suit == card2.suit do
+  def captures?(card1, card2, _trump) when card1.suit == card2.suit do
     card1_score = score(card1)
     card2_score = score(card2)
 
@@ -25,7 +25,7 @@ defmodule ExBisca.Deck.Card do
       else: card1_score > card2_score
   end
 
-  def gt?(_card1, card2, trump) do
+  def captures?(_card1, card2, trump) do
     card2.suit != trump.suit
   end
 
