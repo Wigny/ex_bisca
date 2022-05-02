@@ -22,7 +22,7 @@ defmodule ExBisca.Play do
     hands = Map.new(player_ids, &{&1, Hand.new()})
 
     %__MODULE__{deck: deck, hands: hands}
-    |> deal_player_cards(3)
+    |> deal_players_cards(3)
     |> turn_up_trump()
     |> start_first_round()
   end
@@ -34,7 +34,7 @@ defmodule ExBisca.Play do
     |> prepare_next_move()
   end
 
-  defp deal_player_cards(play, count) do
+  defp deal_players_cards(play, count) do
     Enum.reduce(play.hands, play, fn {player_id, hand}, acc ->
       {cards, deck} = Deck.take(acc.deck, count)
 
@@ -83,6 +83,6 @@ defmodule ExBisca.Play do
     round = Round.restart(play.round, round_winner)
     hands = %{play.hands | round_winner => winner_hand}
 
-    deal_player_cards(%{play | round: round, hands: hands}, 1)
+    deal_players_cards(%{play | round: round, hands: hands}, 1)
   end
 end

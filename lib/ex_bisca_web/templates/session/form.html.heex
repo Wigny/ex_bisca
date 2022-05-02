@@ -1,0 +1,5 @@
+<%= form_for @conn, Routes.session_path(@conn, :create), [as: :player], fn f -> %>
+  <%= text_input(f, :name, required: true, autofocus: true, placeholder: "Please enter your name") %>
+
+  <%= submit("Continue") %>
+<% end %>
