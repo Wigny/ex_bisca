@@ -17,7 +17,7 @@ defmodule ExBisca.PlayTest do
              trump: _trump
            } = Play.start([:player_1, :player_2])
 
-    assert length(deck) == 33
+    assert length(deck) == 34
     assert length(player_1_cards) == 3
     assert length(player_2_cards) == 3
   end
@@ -31,7 +31,7 @@ defmodule ExBisca.PlayTest do
           %Card{rank: 6, suit: :hearts},
           %Card{rank: :king, suit: :spades},
           %Card{rank: 5, suit: :hearts},
-          %Card{rank: :joker, suit: :hearts},
+          %Card{rank: :jack, suit: :hearts},
           %Card{rank: :queen, suit: :hearts},
           %Card{rank: 2, suit: :diamonds},
           %Card{rank: 7, suit: :spades},
@@ -48,12 +48,12 @@ defmodule ExBisca.PlayTest do
           %Card{rank: :ace, suit: :spades},
           %Card{rank: 7, suit: :diamonds},
           %Card{rank: :queen, suit: :diamonds},
-          %Card{rank: :joker, suit: :diamonds},
+          %Card{rank: :jack, suit: :diamonds},
           %Card{rank: 2, suit: :spades},
           %Card{rank: 3, suit: :hearts},
           %Card{rank: :king, suit: :hearts},
           %Card{rank: :ace, suit: :hearts},
-          %Card{rank: :joker, suit: :spades},
+          %Card{rank: :jack, suit: :spades},
           %Card{rank: :queen, suit: :clubs},
           %Card{rank: 5, suit: :spades},
           %Card{rank: :king, suit: :diamonds},
@@ -73,7 +73,7 @@ defmodule ExBisca.PlayTest do
             cards: [
               %Card{rank: 2, suit: :clubs},
               %Card{rank: 5, suit: :clubs},
-              %Card{rank: :joker, suit: :clubs}
+              %Card{rank: :jack, suit: :clubs}
             ],
             score: 0
           }
@@ -91,13 +91,7 @@ defmodule ExBisca.PlayTest do
     test "moves player card and prepare next move", %{play: play} do
       assert %Play{
                hands: %{
-                 player_1: %Play.Hand{
-                   cards: [
-                     %Card{rank: 2, suit: :hearts},
-                     %Card{rank: 4, suit: :diamonds}
-                   ],
-                   score: 0
-                 }
+                 player_1: %Play.Hand{score: 0}
                },
                round: %ExBisca.Play.Round{
                  current_player: :player_2,
@@ -107,38 +101,47 @@ defmodule ExBisca.PlayTest do
     end
 
     test "moves player card and prepare next round", %{play: play} do
-      play = %Play{
-        play
-        | hands: %{
-            play.hands
-            | player_1: %Play.Hand{
-                cards: [
-                  %Card{rank: 2, suit: :hearts},
-                  %Card{rank: 4, suit: :diamonds}
-                ],
-                score: 0
-              }
-          },
-          round: %ExBisca.Play.Round{
-            current_player: :player_2,
-            stack: %{player_1: %Card{rank: :king, suit: :clubs}, player_2: nil}
-          }
-      }
+      play = Play.move(play, :player_1, %Card{rank: :king, suit: :clubs})
 
       assert %Play{
                hands: %{
                  player_1: %Play.Hand{score: 4},
-                 player_2: %Play.Hand{
-                   cards: [
-                     %Card{rank: 5, suit: :clubs},
-                     %Card{rank: :joker, suit: :clubs}
-                   ],
-                   score: 0
-                 }
+                 player_2: %Play.Hand{score: 0}
                },
                round: %ExBisca.Play.Round{
                  current_player: :player_1,
                  stack: %{player_1: nil, player_2: nil}
+               }
+             } = Play.move(play, :player_2, %Card{rank: 2, suit: :clubs})
+    end
+
+    test "deals cards until finish deck", %{play: play} do
+      play = %{
+        play
+        | deck: [],
+          hands: %{
+            player_1: %Play.Hand{
+              cards: [
+                %Card{rank: :king, suit: :clubs}
+              ],
+              score: 58
+            },
+            player_2: %Play.Hand{
+              cards: [
+                %Card{rank: 2, suit: :clubs}
+              ],
+              score: 58
+            }
+          }
+      }
+
+      play = Play.move(play, :player_1, %Card{rank: :king, suit: :clubs})
+
+      assert %Play{
+               deck: [],
+               hands: %{
+                 player_1: %Play.Hand{cards: [], score: 62},
+                 player_2: %Play.Hand{cards: [], score: 58}
                }
              } = Play.move(play, :player_2, %Card{rank: 2, suit: :clubs})
     end

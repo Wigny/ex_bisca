@@ -1,7 +1,7 @@
 defmodule ExBisca.Play.Hand do
   use TypedStruct
 
-  alias ExBisca.Deck.Card
+  alias ExBisca.Play.Deck.Card
 
   @type card :: Card.t()
   @type cards :: list(card)
