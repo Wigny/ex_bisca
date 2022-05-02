@@ -1,9 +1,9 @@
 defmodule ExBisca.Play do
   use TypedStruct
 
-  alias __MODULE__.{Deck, Hand, Round}
+  alias __MODULE__.{Deck, Hand, Player, Round}
 
-  @type player_id :: atom
+  @type player_id :: Player.id()
   @type card :: Deck.Card.t()
   @type hand :: Hand.t()
   @type deck :: Deck.t()

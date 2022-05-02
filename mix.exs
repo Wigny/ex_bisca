@@ -46,6 +46,7 @@ defmodule ExBisca.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:petal_components, "~> 0.15"},
       {:typed_struct, "~> 0.3"},
+      {:secure_random, "~> 0.5"},
       {:mix_test_watch, "~> 1.1", only: :dev, runtime: false}
     ]
   end
