@@ -33,7 +33,7 @@ defmodule ExBisca.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.7"},
+      {:phoenix, "~> 1.6.9"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.17.5"},
@@ -44,7 +44,6 @@ defmodule ExBisca.MixProject do
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:petal_components, "~> 0.15"},
       {:typed_struct, "~> 0.3"},
       {:secure_random, "~> 0.5"},
       {:mix_test_watch, "~> 1.1", only: :dev, runtime: false}
