@@ -1,7 +1,7 @@
 defmodule ExBisca.Play.Player do
   use TypedStruct
 
-  @type id :: binary
+  @type id :: atom
 
   typedstruct enforce: true do
     field :id, id

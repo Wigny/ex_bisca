@@ -12,58 +12,70 @@ defmodule ExBisca.Play.Round do
     field :current_player, player_id
   end
 
+  @spec start(list(player_id), player_id) :: t
   def start(players, current_player) do
-    current_player_index = Enum.find_index(players, &(&1 == current_player))
-    players_length = length(players)
+    round = %__MODULE__{stack: Enum.map(players, &{&1, nil}), current_player: current_player}
 
-    ordered_players = Enum.slide(players, current_player_index..players_length, 0)
-    stack = Enum.map(ordered_players, &{&1, nil})
+    current_player_index = current_player_index(round)
+    players_length = round |> players() |> length()
 
-    %__MODULE__{stack: stack, current_player: current_player}
+    %__MODULE__{round | stack: Enum.slide(round.stack, current_player_index..players_length, 0)}
   end
 
+  @spec restart(t, player_id) :: t
   def restart(round, current_player) do
-    players = stack_players(round)
+    players = players(round)
 
     start(players, current_player)
   end
 
+  @spec move(t, player_id, card) :: t
   def move(round, player_id, card) do
     if player_id == round.current_player do
-      stack = Keyword.update!(round.stack, player_id, fn _card -> card end)
+      stack = Keyword.update!(round.stack, player_id, fn nil -> card end)
       %{round | stack: stack}
     else
       throw("it's not that player's turn to move")
     end
   end
 
+  @spec winner(t, card) :: player_id
   def winner(round, trump) do
-    cards = stack_cards(round)
+    cards = cards(round)
     max_card = Enum.max(cards, &Card.captures?(&1, &2, trump))
-    {winner, ^max_card} = Enum.find(round.stack, &match?({_, ^max_card}, &1))
+    {winner, _max_card} = Enum.find(round.stack, &match?({_player_id, ^max_card}, &1))
 
     winner
   end
 
+  @spec next_player(t) :: player_id
   def next_player(round) do
-    players = stack_players(round)
-    index = Enum.find_index(players, &(&1 == round.current_player))
+    players = players(round)
+    index = current_player_index(round)
 
     Enum.at(players, index + 1) || List.first(players)
   end
 
+  @spec score(t) :: number
   def score(round) do
-    cards = stack_cards(round)
+    cards = cards(round)
     scores = Enum.map(cards, &Card.score/1)
 
     Enum.sum(scores)
   end
 
+  @spec complete?(t) :: boolean
   def complete?(round) do
-    cards = stack_cards(round)
+    cards = cards(round)
     not Enum.any?(cards, &is_nil/1)
   end
 
-  defp stack_players(round), do: Keyword.keys(round.stack)
-  defp stack_cards(round), do: Keyword.values(round.stack)
+  defp current_player_index(round) do
+    players = players(round)
+
+    Enum.find_index(players, &(&1 == round.current_player))
+  end
+
+  defp players(round), do: Keyword.keys(round.stack)
+  defp cards(round), do: Keyword.values(round.stack)
 end

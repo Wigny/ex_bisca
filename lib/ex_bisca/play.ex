@@ -78,7 +78,7 @@ defmodule ExBisca.Play do
     round_winner = Round.winner(play.round, play.trump)
     round_score = Round.score(play.round)
 
-    winner_hand = Hand.update_score(play.hands[round_winner], round_score)
+    winner_hand = Hand.increase_score(play.hands[round_winner], round_score)
 
     round = Round.restart(play.round, round_winner)
     hands = %{play.hands | round_winner => winner_hand}

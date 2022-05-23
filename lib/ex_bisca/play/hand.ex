@@ -8,18 +8,19 @@ defmodule ExBisca.Play.Hand do
 
   typedstruct do
     field :cards, cards, default: []
-    field :score, integer, default: 0
+    field :score, non_neg_integer, default: 0
   end
 
   @spec new(cards) :: t
   def new(cards \\ []), do: %__MODULE__{cards: cards}
 
   @spec deal(t, cards | card) :: t
+
   def deal(hand, cards) when is_list(cards) do
     %{hand | cards: cards ++ hand.cards}
   end
 
-  def deal(hand, card) do
+  def deal(hand, card) when is_struct(card) do
     deal(hand, [card])
   end
 
@@ -32,7 +33,8 @@ defmodule ExBisca.Play.Hand do
     end
   end
 
-  def update_score(hand, score) do
+  @spec increase_score(t, non_neg_integer) :: t
+  def increase_score(hand, score) do
     %{hand | score: hand.score + score}
   end
 end
