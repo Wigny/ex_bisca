@@ -1,10 +1,16 @@
 defmodule ExBisca.Play.Deck.Card do
   use TypedStruct
 
+  @typep rank :: 2 | 3 | 4 | 5 | 6 | 7 | :queen | :jack | :king | :ace
+  @typep suit :: :spades | :hearts | :diamonds | :clubs
+
   typedstruct do
-    field :rank, 2 | 3 | 4 | 5 | 6 | 7 | :queen | :jack | :king | :ace
-    field :suit, :spades | :hearts | :diamonds | :clubs
+    field :rank, rank
+    field :suit, suit
   end
+
+  @spec new(rank, suit) :: t
+  def new(rank, suit), do: struct!(__MODULE__, rank: rank, suit: suit)
 
   @spec score(t) :: 0 | 2 | 3 | 4 | 10 | 11
   def score(%{rank: :queen}), do: 2
