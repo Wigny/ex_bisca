@@ -3,38 +3,41 @@ defmodule ExBisca.Play.Hand do
 
   alias ExBisca.Play.Deck.Card
 
-  @type card :: Card.t()
-  @type cards :: list(card)
+  @typep card :: Card.t()
+  @typep cards :: list(card)
+  @typep score :: non_neg_integer
 
-  typedstruct do
-    field :cards, cards, default: []
-    field :score, non_neg_integer, default: 0
+  typedstruct opaque: true do
+    field :cards, cards
+    field :score, score
   end
 
-  @spec new(cards) :: t
-  def new(cards \\ []), do: %__MODULE__{cards: cards}
-
-  @spec deal(t, cards | card) :: t
-
-  def deal(hand, cards) when is_list(cards) do
-    %{hand | cards: cards ++ hand.cards}
-  end
-
-  def deal(hand, card) when is_struct(card) do
-    deal(hand, [card])
-  end
-
-  @spec drop(t, card) :: t
-  def drop(hand, card) do
-    if card in hand.cards do
-      %{hand | cards: List.delete(hand.cards, card)}
+  @spec new(cards, score) :: t
+  def new(cards \\ [], score \\ 0) do
+    if length(cards) <= 3 do
+      struct!(__MODULE__, cards: cards, score: score)
     else
-      throw("card not found in the hand")
+      raise "A hand must have a maximum of 3 cards at a time, received #{length(cards)}."
     end
   end
 
-  @spec increase_score(t, non_neg_integer) :: t
+  @spec deal_cards(t, cards) :: t
+  def deal_cards(hand, cards) do
+    new(hand.cards ++ cards, hand.score)
+  end
+
+  @spec drop_card(t, card) :: t
+  def drop_card(hand, card) do
+    if card in hand.cards do
+      cards = List.delete(hand.cards, card)
+      new(cards, hand.score)
+    else
+      raise "Card not found in the hand."
+    end
+  end
+
+  @spec increase_score(t, score) :: t
   def increase_score(hand, score) do
-    %{hand | score: hand.score + score}
+    new(hand.cards, hand.score + score)
   end
 end

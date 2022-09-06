@@ -38,7 +38,7 @@ defmodule ExBisca.Play do
     Enum.reduce(play.hands, play, fn {player_id, hand}, acc ->
       {cards, deck} = Deck.take(acc.deck, count)
 
-      %{acc | deck: deck, hands: %{acc.hands | player_id => Hand.deal(hand, cards)}}
+      %{acc | deck: deck, hands: %{acc.hands | player_id => Hand.deal_cards(hand, cards)}}
     end)
   end
 
@@ -56,7 +56,7 @@ defmodule ExBisca.Play do
   end
 
   defp move_player_card(play, player, card) do
-    hand = Hand.drop(play.hands[player], card)
+    hand = Hand.drop_card(play.hands[player], card)
     round = Round.move(play.round, player, card)
 
     %{play | hands: %{play.hands | player => hand}, round: round}
