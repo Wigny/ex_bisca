@@ -4,15 +4,19 @@ defmodule ExBisca.Play.Round do
   alias ExBisca.Play
   alias ExBisca.Play.Deck.Card
 
-  @type player_id :: Play.player_id()
-  @type card :: Card.t()
+  @typep player_id :: Play.player_id()
+  @typep card :: Card.t()
 
   typedstruct enforce: true do
     field :stack, list({player_id, card})
     field :current_player, player_id
   end
 
-  @spec start(list(player_id), player_id) :: t
+  def new(stack, current_player) do
+    struct!(__MODULE__, stack: stack, current_player: current_player)
+  end
+
+  @spec start(players :: list(player_id), current_player :: player_id) :: t
   def start(players, current_player) do
     round = %__MODULE__{stack: Enum.map(players, &{&1, nil}), current_player: current_player}
 
@@ -22,24 +26,29 @@ defmodule ExBisca.Play.Round do
     %__MODULE__{round | stack: Enum.slide(round.stack, current_player_index..players_length, 0)}
   end
 
-  @spec restart(t, player_id) :: t
+  @spec restart(round, current_player :: player_id) :: round when round: t
   def restart(round, current_player) do
     players = players(round)
 
     start(players, current_player)
   end
 
-  @spec move(t, player_id, card) :: t
+  @spec move(round, player_id, card) :: round when round: t
   def move(round, player_id, card) do
     if player_id == round.current_player do
-      stack = Keyword.update!(round.stack, player_id, fn nil -> card end)
-      %{round | stack: stack}
+      stack =
+        Enum.map(round.stack, fn
+          {^player_id, nil} -> {player_id, card}
+          move -> move
+        end)
+
+      %__MODULE__{round | stack: stack}
     else
-      throw("it's not that player's turn to move")
+      raise "It's not that player's turn to move."
     end
   end
 
-  @spec winner(t, card) :: player_id
+  @spec winner(round :: t, trump :: card) :: player_id
   def winner(round, trump) do
     cards = cards(round)
     max_card = Enum.max(cards, &Card.captures?(&1, &2, trump))
@@ -48,15 +57,16 @@ defmodule ExBisca.Play.Round do
     winner
   end
 
-  @spec next_player(t) :: player_id
+  # todo: refactor to get the first nil of the stack
+  @spec next_player(round :: t) :: player_id
   def next_player(round) do
     players = players(round)
     index = current_player_index(round)
 
-    Enum.at(players, index + 1) || List.first(players)
+    Enum.at(players, index + 1, List.first(players))
   end
 
-  @spec score(t) :: number
+  @spec score(round :: t) :: number
   def score(round) do
     cards = cards(round)
     scores = Enum.map(cards, &Card.score/1)
@@ -64,7 +74,7 @@ defmodule ExBisca.Play.Round do
     Enum.sum(scores)
   end
 
-  @spec complete?(t) :: boolean
+  @spec complete?(round :: t) :: boolean
   def complete?(round) do
     cards = cards(round)
     not Enum.any?(cards, &is_nil/1)
@@ -76,6 +86,6 @@ defmodule ExBisca.Play.Round do
     Enum.find_index(players, &(&1 == round.current_player))
   end
 
-  defp players(round), do: Keyword.keys(round.stack)
-  defp cards(round), do: Keyword.values(round.stack)
+  defp players(round), do: Enum.map(round.stack, fn {key, _value} -> key end)
+  defp cards(round), do: Enum.map(round.stack, fn {_key, value} -> value end)
 end

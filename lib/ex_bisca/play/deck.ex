@@ -5,7 +5,7 @@ defmodule ExBisca.Play.Deck do
 
   @cards for suit <- ~w[spades hearts diamonds clubs]a,
              rank <- [2, 3, 4, 5, 6, 7, :queen, :jack, :king, :ace],
-             do: Card.new(suit, rank)
+             do: Card.new(rank, suit)
 
   @spec new :: t
   def new, do: Enum.shuffle(@cards)
