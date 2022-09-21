@@ -2,83 +2,97 @@ defmodule ExBisca.Play.RoundTest do
   use ExUnit.Case
   alias ExBisca.Play.{Deck, Round, Player}
 
+  setup do
+    players = for name <- ~w[John Peter], do: Player.new(name)
+    {cards, _deck} = Deck.take(Deck.new(), 2)
+
+    %{players: players, cards: cards}
+  end
+
+  describe "start/2" do
+    test "starts a new round", setup do
+      %{players: [player1, player2]} = setup
+
+      round = Round.new([{player1.id, nil}, {player2.id, nil}], player1.id)
+
+      assert round == Round.start([player1.id, player2.id], player1.id)
+    end
+  end
+
+  describe "restart/2" do
+    test "restarts a existing round", setup do
+      %{players: [player1, player2], cards: [card1, card2]} = setup
+
+      round1 = Round.new([{player1.id, card1}, {player2.id, card2}], player1.id)
+      round2 = Round.new([{player2.id, nil}, {player1.id, nil}], player2.id)
+
+      assert round2 == Round.restart(round1, player2.id)
+    end
+  end
+
   describe "move/3" do
-    test "makes a player moviment in the round" do
-      %{id: player1_id} = Player.new("John")
-      %{id: player2_id} = Player.new("Peter")
-      {[card], _deck} = Deck.take(Deck.new(), 1)
+    test "makes a player moviment in the round", setup do
+      %{players: [player1, player2], cards: [card1 | _]} = setup
 
-      round = Round.new([{player1_id, nil}, {player2_id, nil}], player1_id)
+      round_move1 = Round.new([{player1.id, nil}, {player2.id, nil}], player1.id)
+      round_move2 = Round.new([{player1.id, card1}, {player2.id, nil}], player1.id)
 
-      assert %Round{
-               stack: [{^player1_id, ^card}, {^player2_id, nil}]
-             } = Round.move(round, player1_id, card)
+      assert round_move2 == Round.move(round_move1, player1.id, card1)
     end
 
-    test "fails when trying to make a card move for a player that is not his turn" do
-      %{id: player1_id} = Player.new("John")
-      %{id: player2_id} = Player.new("Peter")
-      {[card], _deck} = Deck.take(Deck.new(), 1)
+    test "fails when trying to make a card move for a player that is not his turn", setup do
+      %{players: [player1, player2], cards: [card | _]} = setup
 
-      round = Round.new([{player1_id, nil}, {player2_id, nil}], player1_id)
+      round = Round.new([{player1.id, nil}, {player2.id, nil}], player1.id)
 
       message = "It's not that player's turn to move."
-      assert_raise RuntimeError, message, fn -> Round.move(round, player2_id, card) end
+      assert_raise RuntimeError, message, fn -> Round.move(round, player2.id, card) end
     end
   end
 
   describe "winner/2" do
-    test "finds the winner player of the round" do
-      %{id: player1_id} = Player.new("John")
-      %{id: player2_id} = Player.new("Peter")
-      card1 = Deck.Card.new(2, :spades)
-      card2 = Deck.Card.new(2, :hearts)
-      trump = Deck.Card.new(6, :hearts)
+    test "finds the winner player of the round", setup do
+      %{players: [player1, player2], cards: [card1, trump]} = setup
 
-      round = Round.new([{player1_id, card1}, {player2_id, card2}], player1_id)
+      round = Round.new([{player1.id, card1}, {player2.id, trump}], player1.id)
 
-      assert player2_id == Round.winner(round, trump)
+      assert player2.id == Round.winner(round, trump)
     end
   end
 
   describe "next_player/1" do
-    test "finds the next player of the round" do
-      %{id: player1_id} = Player.new("John")
-      %{id: player2_id} = Player.new("Peter")
-      {[card1, card2], _deck} = Deck.take(Deck.new(), 2)
+    test "finds the next player of the round", setup do
+      %{players: [player1, player2], cards: [card1, card2]} = setup
 
-      round_1 = Round.new([{player1_id, nil}, {player2_id, nil}], player1_id)
-      round_2 = Round.new([{player1_id, card1}, {player2_id, card2}], player2_id)
+      round1 = Round.new([{player1.id, nil}, {player2.id, nil}], player1.id)
+      round2 = Round.new([{player1.id, card1}, {player2.id, card2}], player2.id)
 
-      assert player2_id == Round.next_player(round_1)
-      assert player1_id == Round.next_player(round_2)
+      assert player2.id == Round.next_player(round1)
+      assert player1.id == Round.next_player(round2)
     end
   end
 
   describe "score/1" do
-    test "sums the round cards score" do
-      player_1 = Player.new("John")
-      player_2 = Player.new("Peter")
-      card1 = Deck.Card.new(7, :hearts)
-      card2 = Deck.Card.new(:ace, :hearts)
+    test "sums the round cards score", setup do
+      %{players: [player1, player2], cards: [card1, card2] = cards} = setup
 
-      round = Round.new([{player_1.id, card1}, {player_2.id, card2}], player_2.id)
+      round = Round.new([{player1.id, card1}, {player2.id, card2}], player2.id)
 
-      assert 21 == Round.score(round)
+      assert cards
+             |> Enum.map(&Deck.Card.score/1)
+             |> Enum.sum() == Round.score(round)
     end
   end
 
   describe "complete?/1" do
-    test "checks if all players have already played this round" do
-      player_1 = Player.new("John")
-      player_2 = Player.new("Peter")
-      {[card1, card2], _deck} = Deck.take(Deck.new(), 2)
+    test "checks if all players have already played this round", setup do
+      %{players: [player1, player2], cards: [card1, card2]} = setup
 
-      round_1 = Round.new([{player_1.id, card1}, {player_2.id, nil}], player_2.id)
-      round_2 = Round.new([{player_1.id, card1}, {player_2.id, card2}], player_2.id)
+      round1 = Round.new([{player1.id, card1}, {player2.id, nil}], player2.id)
+      round2 = Round.new([{player1.id, card1}, {player2.id, card2}], player2.id)
 
-      refute Round.complete?(round_1)
-      assert Round.complete?(round_2)
+      refute Round.complete?(round1)
+      assert Round.complete?(round2)
     end
   end
 end

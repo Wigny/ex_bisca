@@ -33,6 +33,7 @@ defmodule ExBisca.Play.Round do
     start(players, current_player)
   end
 
+  # todo: refactor to change the current_player of the round
   @spec move(round, player_id, card) :: round when round: t
   def move(round, player_id, card) do
     if player_id == round.current_player do
@@ -58,6 +59,7 @@ defmodule ExBisca.Play.Round do
   end
 
   # todo: refactor to get the first nil of the stack
+  # todo: refactor to remove the next_player function
   @spec next_player(round :: t) :: player_id
   def next_player(round) do
     players = players(round)

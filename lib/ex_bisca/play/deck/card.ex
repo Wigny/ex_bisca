@@ -22,13 +22,15 @@ defmodule ExBisca.Play.Deck.Card do
 
   @spec captures?(t, t, t) :: boolean
 
-  def captures?(card1, card2, _trump) when card1.suit == card2.suit do
+  def captures?(%{suit: suit} = card1, %{suit: suit} = card2, _trump) do
     card1_score = score(card1)
     card2_score = score(card2)
 
-    if card1_score == 0 and card2_score == 0,
-      do: card1.rank > card2.rank,
-      else: card1_score > card2_score
+    if card1_score != card2_score do
+      card1_score > card2_score
+    else
+      card1.rank > card2.rank
+    end
   end
 
   def captures?(_card1, card2, trump) do
