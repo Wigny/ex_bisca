@@ -11,5 +11,5 @@ defmodule ExBisca.Play.Deck do
   def new, do: Enum.shuffle(@cards)
 
   @spec take(t, integer) :: {t, t}
-  def take(deck, count \\ 1), do: Enum.split(deck, count)
+  def take(deck, count), do: Enum.split(deck, count)
 end

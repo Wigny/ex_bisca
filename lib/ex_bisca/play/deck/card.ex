@@ -31,7 +31,7 @@ defmodule ExBisca.Play.Deck.Card do
 
   defimpl Inspect do
     def inspect(card, _opts) do
-      Enum.join(["#Card<", rank(card.rank), suit(card.suit), ">"])
+       Inspect.Algebra.concat(["#Card<", rank(card.rank), suit(card.suit), ">"])
     end
 
     defp rank(:queen), do: "Q"

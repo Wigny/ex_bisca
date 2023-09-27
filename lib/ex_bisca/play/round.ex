@@ -17,7 +17,7 @@ defmodule ExBisca.Play.Round do
     round = %__MODULE__{stack: Enum.map(players, &{&1, nil}), current_player: current_player}
 
     current_player_index = current_player_index(round)
-    players_length = round |> players() |> length()
+    players_length = length(players(round))
 
     %__MODULE__{round | stack: Enum.slide(round.stack, current_player_index..players_length, 0)}
   end
@@ -32,10 +32,10 @@ defmodule ExBisca.Play.Round do
   @spec move(t, player_id, card) :: t
   def move(round, player_id, card) do
     if player_id == round.current_player do
-      stack = Keyword.update!(round.stack, player_id, fn nil -> card end)
+      stack = put_in(round.stack, [player_id], card)
       %{round | stack: stack}
     else
-      throw("it's not that player's turn to move")
+      raise "it's not that player's turn to move"
     end
   end
 
@@ -67,6 +67,7 @@ defmodule ExBisca.Play.Round do
   @spec complete?(t) :: boolean
   def complete?(round) do
     cards = cards(round)
+
     not Enum.any?(cards, &is_nil/1)
   end
 
