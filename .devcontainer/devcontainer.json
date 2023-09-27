@@ -1,26 +1,19 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/elixir
 {
-	"name": "Elixir (Community)",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": {
-			// Elixir Version: 1.9, 1.10, 1.10.4, ...
-			"VARIANT": "latest"
+	"name": "ExBisca",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "elixir",
+	"workspaceFolder": "/workspace",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"jakebecker.elixir-ls"
+			]
 		}
 	},
-
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"jakebecker.elixir-ls"
+	"forwardPorts": [
+		4000,
+		4001,
 	],
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "mix deps.get"
-
-	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+	"postCreateCommand": "mix setup",
 	"remoteUser": "vscode"
 }

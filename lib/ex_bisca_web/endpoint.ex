@@ -7,10 +7,11 @@ defmodule ExBiscaWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_ex_bisca_key",
-    signing_salt: "9z1aQ4Qo"
+    signing_salt: "9z1aQ4Qo",
+    same_site: "Lax"
   ]
 
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  # socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -20,13 +21,11 @@ defmodule ExBiscaWeb.Endpoint do
     at: "/",
     from: :ex_bisca,
     gzip: false,
-    only: ~w(assets fonts images favicon.ico robots.txt)
+    only: ExBiscaWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
-    socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
-    plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
   end
 

@@ -5,9 +5,8 @@ defmodule ExBisca.MixProject do
     [
       app: :ex_bisca,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -33,15 +32,9 @@ defmodule ExBisca.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.9"},
-      {:phoenix_html, "~> 3.0"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.17.5"},
-      {:floki, ">= 0.30.0", only: :test},
-      {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
+      {:phoenix, "~> 1.7.7"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:typed_struct, "~> 0.3"},
@@ -58,8 +51,7 @@ defmodule ExBisca.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get"],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      setup: ["deps.get"]
     ]
   end
 end
