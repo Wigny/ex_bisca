@@ -11,7 +11,6 @@ import Config
 config :ex_bisca, ExBiscaWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
-    formats: [json: ExBiscaWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: ExBisca.PubSub,

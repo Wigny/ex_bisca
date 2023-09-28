@@ -35,18 +35,6 @@ defmodule ExBiscaWeb do
     end
   end
 
-  def controller do
-    quote do
-      use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: ExBiscaWeb.Layouts]
-
-      import Plug.Conn
-
-      unquote(verified_routes())
-    end
-  end
-
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,

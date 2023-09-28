@@ -33,6 +33,7 @@ defmodule ExBisca.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.7.7"},
+      {:live_state, "~> 0.7.0"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
