@@ -1,14 +1,11 @@
 defmodule ExBisca.Play.Player do
-  use TypedStruct
+  @type id :: binary
+  @type t :: %__MODULE__{id: id, name: binary}
 
-  @type id :: atom
-
-  typedstruct enforce: true do
-    field :id, id
-    field :name, binary
-  end
+  @enforce_keys [:id, :name]
+  defstruct [:id, :name]
 
   def new(name) do
-    %__MODULE__{id: SecureRandom.hex(), name: name}
+    %__MODULE__{id: Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false), name: name}
   end
 end

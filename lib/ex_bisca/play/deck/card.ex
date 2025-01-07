@@ -1,28 +1,31 @@
 defmodule ExBisca.Play.Deck.Card do
-  use TypedStruct
+  @type rank :: 2 | 3 | 4 | 5 | 6 | 7 | :queen | :jack | :king | :ace
+  @type suit :: :spades | :hearts | :diamonds | :clubs
+  @type score :: 0 | 2 | 3 | 4 | 10 | 11
 
-  typedstruct do
-    field :rank, 2 | 3 | 4 | 5 | 6 | 7 | :queen | :jack | :king | :ace
-    field :suit, :spades | :hearts | :diamonds | :clubs
+  @type t :: %__MODULE__{rank: rank, suit: suit, score: score}
+
+  defstruct [:rank, :suit, :score]
+
+  @spec new(suit, rank) :: t
+  def new(suit, rank) do
+    %__MODULE__{suit: suit, rank: rank, score: score(rank)}
   end
 
-  @spec score(t) :: 0 | 2 | 3 | 4 | 10 | 11
-  def score(%{rank: :queen}), do: 2
-  def score(%{rank: :jack}), do: 3
-  def score(%{rank: :king}), do: 4
-  def score(%{rank: 7}), do: 10
-  def score(%{rank: :ace}), do: 11
-  def score(_card), do: 0
+  defp score(:queen), do: 2
+  defp score(:jack), do: 3
+  defp score(:king), do: 4
+  defp score(7), do: 10
+  defp score(:ace), do: 11
+  defp score(_card), do: 0
 
   @spec captures?(t, t, t) :: boolean
+  def captures?(%{score: 0, suit: suit} = card1, %{score: 0, suit: suit} = card2, _trump) do
+    card1.rank > card2.rank
+  end
 
-  def captures?(card1, card2, _trump) when card1.suit == card2.suit do
-    card1_score = score(card1)
-    card2_score = score(card2)
-
-    if card1_score == 0 and card2_score == 0,
-      do: card1.rank > card2.rank,
-      else: card1_score > card2_score
+  def captures?(%{suit: suit} = card1, %{suit: suit} = card2, _trump) do
+    card1.score > card2.score
   end
 
   def captures?(_card1, card2, trump) do
@@ -31,7 +34,7 @@ defmodule ExBisca.Play.Deck.Card do
 
   defimpl Inspect do
     def inspect(card, _opts) do
-       Inspect.Algebra.concat(["#Card<", rank(card.rank), suit(card.suit), ">"])
+      Inspect.Algebra.concat(["#Card<", rank(card.rank), suit(card.suit), ">"])
     end
 
     defp rank(:queen), do: "Q"

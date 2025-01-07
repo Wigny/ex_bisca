@@ -1,25 +1,19 @@
 defmodule ExBisca.Play do
-  use TypedStruct
+  alias ExBisca.Play.{Deck, Hand, Player, Round}
 
-  alias __MODULE__.{Deck, Hand, Player, Round}
-
-  @type player_id :: Player.id()
+  @type player :: Player.t()
   @type card :: Deck.Card.t()
   @type hand :: Hand.t()
   @type deck :: Deck.t()
   @type round :: Round.t()
+  @type t :: %{deck: deck, trump: card, hands: %{player => hand}, round: round}
 
-  typedstruct opaque: true do
-    field :deck, deck
-    field :trump, card
-    field :hands, %{player_id => hand}, default: %{}
-    field :round, round
-  end
+  defstruct [:deck, :trump, :round, hands: %{}]
 
-  @spec start(player_ids :: list(player_id)) :: t
-  def start(player_ids) do
+  @spec start(players :: list(player)) :: t
+  def start(players) do
     deck = Deck.new()
-    hands = Map.new(player_ids, &{&1, Hand.new()})
+    hands = Map.new(players, &{&1, Hand.new()})
 
     %__MODULE__{deck: deck, hands: hands}
     |> deal_players_cards(3)
@@ -27,18 +21,18 @@ defmodule ExBisca.Play do
     |> start_first_round()
   end
 
-  @spec move(t, player_id, card) :: t
-  def move(play, player_id, card) do
+  @spec move(t, player, card) :: t
+  def move(play, player, card) do
     play
-    |> move_player_card(player_id, card)
+    |> move_player_card(player, card)
     |> prepare_next_move()
   end
 
   defp deal_players_cards(play, count) do
-    Enum.reduce(play.hands, play, fn {player_id, hand}, acc ->
+    Enum.reduce(play.hands, play, fn {player, hand}, acc ->
       {cards, deck} = Deck.take(acc.deck, count)
 
-      %{acc | deck: deck, hands: %{acc.hands | player_id => Hand.deal(hand, cards)}}
+      %{acc | deck: deck, hands: %{acc.hands | player => Hand.deal(hand, cards)}}
     end)
   end
 

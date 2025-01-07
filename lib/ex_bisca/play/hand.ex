@@ -1,15 +1,11 @@
 defmodule ExBisca.Play.Hand do
-  use TypedStruct
-
   alias ExBisca.Play.Deck.Card
 
   @type card :: Card.t()
   @type cards :: list(card)
+  @type t :: %__MODULE__{cards: cards, score: non_neg_integer()}
 
-  typedstruct do
-    field :cards, cards, default: []
-    field :score, non_neg_integer, default: 0
-  end
+  defstruct cards: [], score: 0
 
   @spec new(cards) :: t
   def new(cards \\ []), do: %__MODULE__{cards: cards}
