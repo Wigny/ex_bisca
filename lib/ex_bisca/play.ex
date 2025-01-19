@@ -7,26 +7,25 @@ defmodule ExBisca.Play do
   @type hand :: Hand.t()
   @type deck :: Deck.t()
   @type round :: Round.t()
-  @type t :: %__MODULE__{deck: deck, trump: card, hands: %{player_id => hand}, round: round}
+  @type t :: %__MODULE__{
+          deck: deck,
+          trump: card,
+          player_ids: list(player_id),
+          hands: %{player_id => hand},
+          round: round
+        }
 
-  defstruct [:deck, :trump, :round, hands: %{}]
+  defstruct [:deck, :trump, :round, :player_ids, :hands]
 
   @spec start(player_ids :: list(player_id)) :: t
   def start(player_ids) do
     deck = Deck.new()
     hands = Map.from_keys(player_ids, Hand.new())
 
-    %__MODULE__{deck: deck, hands: hands}
+    %__MODULE__{deck: deck, player_ids: player_ids, hands: hands}
     |> deal_players_cards(3)
     |> turn_up_trump()
     |> start_first_round()
-  end
-
-  @spec move(play :: t, player_id, card) :: t
-  def move(play, player_id, card) do
-    play
-    |> move_player_card(player_id, card)
-    |> prepare_next_move()
   end
 
   defp deal_players_cards(play, count) do
@@ -44,9 +43,14 @@ defmodule ExBisca.Play do
   end
 
   defp start_first_round(play) do
-    player_ids = Map.keys(play.hands)
+    %{play | round: Round.new(play.player_ids)}
+  end
 
-    %{play | round: Round.new(player_ids)}
+  @spec move(play :: t, player_id, card) :: t
+  def move(play, player_id, card) do
+    play
+    |> move_player_card(player_id, card)
+    |> prepare_next_move()
   end
 
   defp move_player_card(play, player_id, card) do

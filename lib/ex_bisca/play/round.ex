@@ -11,8 +11,9 @@ defmodule ExBisca.Play.Round do
           current_player_id: player_id
         }
 
-  @enforce_keys [:stack, :player_ids, :current_player_id]
-  defstruct [:stack, :player_ids, :current_player_id]
+  fields = [:stack, :player_ids, :current_player_id]
+  @enforce_keys fields
+  defstruct fields
 
   @spec new(player_ids :: list(player_id)) :: t
   def new(player_ids) when length(player_ids) in [2, 4] do
