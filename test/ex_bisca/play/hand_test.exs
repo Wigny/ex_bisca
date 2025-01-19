@@ -4,7 +4,7 @@ defmodule ExBisca.Play.HandTest do
 
   @deck ExBisca.Play.Deck.new()
 
-  describe "add/2" do
+  describe "deal/2" do
     test "adds cards to a hand" do
       cards_drawn = Enum.take(@deck, 3)
 

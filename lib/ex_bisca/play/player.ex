@@ -5,7 +5,9 @@ defmodule ExBisca.Play.Player do
   @enforce_keys [:id, :name]
   defstruct [:id, :name]
 
+  @spec new(name :: binary) :: t
   def new(name) do
-    %__MODULE__{id: Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false), name: name}
+    id = Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false)
+    %__MODULE__{id: id, name: name}
   end
 end

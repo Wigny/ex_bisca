@@ -11,7 +11,7 @@ defmodule ExBisca.Play.RoundTest do
   describe "new/2" do
     test "creates a new round" do
       assert %Round{} = round = Round.new([@player1.id, @player2.id])
-      assert round.stack == %{@player1.id => nil, @player2.id => nil}
+      assert round.stack == [{@player1.id, nil}, {@player2.id, nil}]
       assert round.current_player_id == @player1.id
     end
   end
@@ -21,8 +21,7 @@ defmodule ExBisca.Play.RoundTest do
       round = Round.new([@player1.id, @player2.id])
 
       assert %Round{} = round = Round.restart(round, @player2.id)
-      assert round.stack == %{@player1.id => nil, @player2.id => nil}
-      assert round.current_player_id == @player2.id
+      assert round.stack == [{@player2.id, nil}, {@player1.id, nil}]
     end
   end
 
@@ -36,7 +35,7 @@ defmodule ExBisca.Play.RoundTest do
       card = Card.new(:spades, :ace)
 
       assert %Round{stack: stack} = Round.move(round, @player1.id, card)
-      assert stack == %{@player1.id => card, @player2.id => nil}
+      assert stack == [{@player1.id, card}, {@player2.id, nil}]
     end
 
     test "updates the current player as the next player", %{round: round} do

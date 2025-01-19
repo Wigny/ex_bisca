@@ -13,7 +13,7 @@ defmodule ExBisca.Play.Hand do
   @spec new(cards) :: t
   def new(cards) when length(cards) == 3, do: %__MODULE__{cards: cards}
 
-  @spec deal(t, cards | card) :: t
+  @spec deal(t, cards) :: t
   def deal(hand, cards) when is_list(cards) do
     cards = Enum.concat(hand.cards, cards)
 
