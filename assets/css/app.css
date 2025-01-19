@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/forms";
+@plugin "./plugins/heroicons.js";
+
+@source "../js/**/*.ts";
+@source "../../lib/ex_bisca_web.ex";
+@source "../../lib/ex_bisca_web/**/*.*ex";
+
+@variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
