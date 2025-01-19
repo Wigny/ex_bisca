@@ -1,79 +1,77 @@
 defmodule ExBisca.Play.Round do
   alias ExBisca.Play.Player
-  alias ExBisca.Play.Deck.Card
+  alias ExBisca.Play.Card
 
-  @type player :: Player.t()
+  @type player_id :: Player.id()
   @type card :: Card.t()
 
-  @type t :: %__MODULE__{stack: list({player, card}), current_player: player}
+  @type t :: %__MODULE__{
+          stack: %{player_id => card},
+          player_ids: list(player_id),
+          current_player_id: player_id
+        }
 
-  @enforce_keys [:stack, :current_player]
-  defstruct [:stack, :current_player]
+  @enforce_keys [:stack, :player_ids, :current_player_id]
+  defstruct [:stack, :player_ids, :current_player_id]
 
-  @spec start(list(player), player) :: t
-  def start(players, current_player) do
-    round = %__MODULE__{stack: Enum.map(players, &{&1, nil}), current_player: current_player}
-
-    current_player_index = current_player_index(round)
-    players_length = length(players(round))
-
-    %__MODULE__{round | stack: Enum.slide(round.stack, current_player_index..players_length, 0)}
+  @spec new(player_ids :: list(player_id)) :: t
+  def new(player_ids) when length(player_ids) in [2, 4] do
+    %__MODULE__{
+      stack: Map.from_keys(player_ids, nil),
+      player_ids: player_ids,
+      current_player_id: List.first(player_ids)
+    }
   end
 
-  @spec restart(t, player) :: t
-  def restart(round, current_player) do
-    players = players(round)
-
-    start(players, current_player)
+  @spec restart(round :: t, next_player_id :: player_id) :: t
+  def restart(round, next_player_id) do
+    current_player_index = player_index(round, next_player_id)
+    player_ids = Enum.slide(round.player_ids, current_player_index, 0)
+    new(player_ids)
   end
 
-  @spec move(t, player, card) :: t
-  def move(round, player, card) do
-    if player == round.current_player do
-      stack = put_in(round.stack, [player], card)
-      %{round | stack: stack}
+  @spec move(round :: t, player_id, card) :: t
+  def move(round, player_id, card) do
+    if player_id == round.current_player_id do
+      stack = Map.update!(round.stack, player_id, fn nil -> card end)
+      next_player_id = next_player_id(round)
+
+      %{round | stack: stack, current_player_id: next_player_id}
     else
-      raise "it's not that player's turn to move"
+      raise "it's not that player_id's turn to move"
     end
   end
 
-  @spec winner(t, card) :: player
-  def winner(round, trump) do
-    cards = cards(round)
+  @spec winner_id(round :: t, trump :: card) :: player_id
+  def winner_id(round, trump) do
+    cards = Map.values(round.stack)
     max_card = Enum.max(cards, &Card.captures?(&1, &2, trump))
-    {winner, _max_card} = Enum.find(round.stack, &match?({_player, ^max_card}, &1))
+    {winner_id, ^max_card} = Enum.find(round.stack, &match?({_player_id, ^max_card}, &1))
 
-    winner
+    winner_id
   end
 
-  @spec next_player(t) :: player
-  def next_player(round) do
-    players = players(round)
-    index = current_player_index(round)
+  defp next_player_id(round) do
+    current_player_index = player_index(round, round.current_player_id)
 
-    Enum.at(players, index + 1, List.first(players))
+    Enum.at(round.player_ids, current_player_index + 1)
   end
 
-  @spec score(t) :: number
+  @spec score(round :: t) :: number
   def score(round) do
-    cards = cards(round)
+    cards = Map.values(round.stack)
 
     Enum.sum_by(cards, & &1.score)
   end
 
-  @spec complete?(t) :: boolean
+  @spec complete?(round :: t) :: boolean
   def complete?(round) do
-    cards = cards(round)
+    cards = Map.values(round.stack)
 
     not Enum.any?(cards, &is_nil/1)
   end
 
-  defp current_player_index(round) do
-    players = players(round)
-
-    Enum.find_index(players, &(&1 == round.current_player))
+  defp player_index(round, player_id) do
+    Enum.find_index(round.player_ids, &(&1 == player_id))
   end
-
-  defp players(round), do: Keyword.keys(round.stack)
-  defp cards(round), do: Keyword.values(round.stack)
 end

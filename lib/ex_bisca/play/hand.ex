@@ -1,5 +1,5 @@
 defmodule ExBisca.Play.Hand do
-  alias ExBisca.Play.Deck.Card
+  alias ExBisca.Play.Card
 
   @type card :: Card.t()
   @type cards :: list(card)
@@ -7,12 +7,21 @@ defmodule ExBisca.Play.Hand do
 
   defstruct cards: [], score: 0
 
+  @spec new() :: t
+  def new, do: %__MODULE__{}
+
   @spec new(cards) :: t
-  def new(cards \\ []), do: %__MODULE__{cards: cards}
+  def new(cards) when length(cards) == 3, do: %__MODULE__{cards: cards}
 
   @spec deal(t, cards | card) :: t
   def deal(hand, cards) when is_list(cards) do
-    %{hand | cards: Enum.concat(cards, hand.cards)}
+    cards = Enum.concat(hand.cards, cards)
+
+    if length(cards) <= 3 do
+      %{hand | cards: cards}
+    else
+      raise "invalid number of cards in a hand"
+    end
   end
 
   @spec drop(t, card) :: t

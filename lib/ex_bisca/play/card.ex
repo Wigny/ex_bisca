@@ -1,4 +1,4 @@
-defmodule ExBisca.Play.Deck.Card do
+defmodule ExBisca.Play.Card do
   @type rank :: 2 | 3 | 4 | 5 | 6 | 7 | :queen | :jack | :king | :ace
   @type suit :: :spades | :hearts | :diamonds | :clubs
   @type score :: 0 | 2 | 3 | 4 | 10 | 11
@@ -8,16 +8,16 @@ defmodule ExBisca.Play.Deck.Card do
   defstruct [:rank, :suit, :score]
 
   @spec new(suit, rank) :: t
-  def new(suit, rank) do
+  def new(suit, rank) when suit in ~w[spades hearts diamonds clubs]a do
     %__MODULE__{suit: suit, rank: rank, score: score(rank)}
   end
 
-  defp score(:queen), do: 2
-  defp score(:jack), do: 3
-  defp score(:king), do: 4
-  defp score(7), do: 10
   defp score(:ace), do: 11
-  defp score(_card), do: 0
+  defp score(7), do: 10
+  defp score(:king), do: 4
+  defp score(:jack), do: 3
+  defp score(:queen), do: 2
+  defp score(rank) when rank in 2..6, do: 0
 
   @spec captures?(t, t, t) :: boolean
   def captures?(%{score: 0, suit: suit} = card1, %{score: 0, suit: suit} = card2, _trump) do
@@ -41,7 +41,7 @@ defmodule ExBisca.Play.Deck.Card do
     defp rank(:jack), do: "J"
     defp rank(:king), do: "K"
     defp rank(:ace), do: "A"
-    defp rank(rank), do: rank
+    defp rank(rank), do: to_string(rank)
 
     defp suit(:spades), do: "\u2660"
     defp suit(:hearts), do: "\u2665"
