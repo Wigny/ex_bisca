@@ -7,7 +7,9 @@ defmodule ExBisca.Application do
   def start(_type, _args) do
     children = [
       {Phoenix.PubSub, name: ExBisca.PubSub},
-      ExBiscaWeb.Endpoint
+      ExBiscaWeb.Endpoint,
+      ExBisca.GameRegistry,
+      ExBisca.GameSupervisor
     ]
 
     opts = [strategy: :one_for_one, name: ExBisca.Supervisor]
