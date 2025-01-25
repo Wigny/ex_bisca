@@ -1,22 +1,27 @@
 defmodule ExBisca.Play.Hand do
-  use TypedStruct
-
-  alias ExBisca.Play.Deck.Card
+  alias ExBisca.Play.Card
 
   @type card :: Card.t()
   @type cards :: list(card)
+  @type t :: %__MODULE__{cards: cards, score: non_neg_integer()}
 
-  typedstruct do
-    field :cards, cards, default: []
-    field :score, non_neg_integer, default: 0
-  end
+  defstruct cards: [], score: 0
+
+  @spec new() :: t
+  def new, do: %__MODULE__{}
 
   @spec new(cards) :: t
-  def new(cards \\ []), do: %__MODULE__{cards: cards}
+  def new(cards) when length(cards) == 3, do: %__MODULE__{cards: cards}
 
-  @spec deal(t, cards | card) :: t
+  @spec deal(t, cards) :: t
   def deal(hand, cards) when is_list(cards) do
-    %{hand | cards: Enum.concat(cards, hand.cards)}
+    cards = Enum.concat(hand.cards, cards)
+
+    if length(cards) <= 3 do
+      %{hand | cards: cards}
+    else
+      raise "invalid number of cards in a hand"
+    end
   end
 
   @spec drop(t, card) :: t

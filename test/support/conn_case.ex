@@ -19,15 +19,15 @@ defmodule ExBiscaWeb.ConnCase do
 
   using do
     quote do
+      # The default endpoint for testing
+      @endpoint ExBiscaWeb.Endpoint
+
+      use ExBiscaWeb, :verified_routes
+
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
       import ExBiscaWeb.ConnCase
-
-      alias ExBiscaWeb.Router.Helpers, as: Routes
-
-      # The default endpoint for testing
-      @endpoint ExBiscaWeb.Endpoint
     end
   end
 

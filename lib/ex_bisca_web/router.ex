@@ -5,23 +5,14 @@ defmodule ExBiscaWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {ExBiscaWeb.LayoutView, :root}
+    plug :put_root_layout, html: {ExBiscaWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-  end
-
-  pipeline :api do
-    plug :accepts, ["json"]
   end
 
   scope "/", ExBiscaWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", PageController, :home
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", ExBiscaWeb do
-  #   pipe_through :api
-  # end
 end
