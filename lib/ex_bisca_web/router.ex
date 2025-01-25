@@ -13,6 +13,7 @@ defmodule ExBiscaWeb.Router do
   scope "/", ExBiscaWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    resources "/session", SessionController, only: [:new, :create], singleton: true
+    live "/", HomeLive
   end
 end

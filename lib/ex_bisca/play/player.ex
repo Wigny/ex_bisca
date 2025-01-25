@@ -7,7 +7,7 @@ defmodule ExBisca.Play.Player do
 
   @spec new(name :: binary) :: t
   def new(name) do
-    id = Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false)
+    id = Base.url_encode64(name, padding: false)
     %__MODULE__{id: id, name: name}
   end
 end
