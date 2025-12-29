@@ -3,7 +3,7 @@ defmodule ExBiscaWeb.SessionHTML do
 
   def new(assigns) do
     ~H"""
-    <.form :let={f} for={@conn.params["user"]} as={:user} action={~p"/session"}>
+    <.form :let={f} for={@form} as={:user} action={~p"/session"}>
       <input
         id={f[:name].id}
         name={f[:name].name}

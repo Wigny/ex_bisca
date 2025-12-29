@@ -38,9 +38,7 @@ defmodule ExBiscaWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller,
-        formats: [:html],
-        layouts: [html: ExBiscaWeb.Layouts]
+      use Phoenix.Controller, formats: [:html]
 
       import Plug.Conn
 
@@ -50,8 +48,7 @@ defmodule ExBiscaWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {ExBiscaWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -83,8 +80,9 @@ defmodule ExBiscaWeb do
       # HTML escaping functionality
       import Phoenix.HTML
 
-      # Shortcut for generating JS commands
+      # Common modules used in templates
       alias Phoenix.LiveView.JS
+      alias ExBiscaWeb.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

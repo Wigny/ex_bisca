@@ -16,7 +16,8 @@ defmodule ExBiscaWeb.Endpoint do
     at: "/",
     from: :ex_bisca,
     gzip: not code_reloading?,
-    only: ExBiscaWeb.static_paths()
+    only: ExBiscaWeb.static_paths(),
+    raise_on_missing_only: code_reloading?
 
   if code_reloading? do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket

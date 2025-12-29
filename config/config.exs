@@ -1,5 +1,8 @@
 import Config
 
+config :ex_bisca,
+  generators: [timestamp_type: :utc_datetime]
+
 config :ex_bisca, ExBiscaWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -11,26 +14,27 @@ config :ex_bisca, ExBiscaWeb.Endpoint,
   live_view: [signing_salt: "lyqGhp7a"]
 
 config :bun,
-  version: "1.1.45",
-  ex_bisca: [
+  version: "1.3.5",
+  js: [
     args: ~w(
       build js/app.js
-        --outdir=../priv/static/assets
+        --outdir=../priv/static/assets/js
         --external /fonts/*
         --external /images/*
     ),
     cd: Path.expand("../assets", __DIR__)
-  ]
-
-config :tailwind,
-  version: "4.0.0",
-  ex_bisca: [
+  ],
+  css: [
     args: ~w(
-      --input=css/app.css
-      --output=../priv/static/assets/app.css
+      run tailwindcss
+        --input=css/app.css
+        --output=../priv/static/assets/css/app.css
     ),
     cd: Path.expand("../assets", __DIR__)
   ]
+
+config :phoenix_live_view, :colocated_js,
+  target_directory: Path.expand("../assets/node_modules/phoenix-colocated", __DIR__)
 
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",

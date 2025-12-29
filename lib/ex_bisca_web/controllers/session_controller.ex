@@ -4,7 +4,8 @@ defmodule ExBiscaWeb.SessionController do
   plug :redirect_if_logged
 
   def new(conn, _params) do
-    render(conn, :new)
+    form = Phoenix.Component.to_form(%{"name" => nil}, as: "user")
+    render(conn, :new, form: form)
   end
 
   def create(conn, %{"user" => %{"name" => username}}) do

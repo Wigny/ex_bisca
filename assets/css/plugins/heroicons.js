@@ -1,7 +1,8 @@
+import plugin from "tailwindcss/plugin";
 import fs from "fs";
 import path from "path";
 
-export default function ({ matchComponents, theme }) {
+export default plugin(function ({ matchComponents, theme }) {
   let iconsDir = path.join(__dirname, "../../node_modules/heroicons");
   let values = {};
   let icons = [
@@ -19,6 +20,7 @@ export default function ({ matchComponents, theme }) {
   matchComponents({
     "hero": ({ name, fullPath }) => {
       let content = fs.readFileSync(fullPath).toString().replace(/\r?\n|\r/g, "");
+      content = encodeURIComponent(content);
       let size = theme("spacing.6");
       if (name.endsWith("-mini")) {
         size = theme("spacing.5");
@@ -38,4 +40,4 @@ export default function ({ matchComponents, theme }) {
       };
     }
   }, { values });
-}
+});
