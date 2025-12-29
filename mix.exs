@@ -39,7 +39,9 @@ defmodule ExBisca.MixProject do
       {:phoenix_live_view, "~> 1.1.0"},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:bun, "~> 1.6", runtime: Mix.env() == :dev},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:tidewave, "~> 0.5", only: :dev},
+      {:usage_rules, "~> 0.1", only: :dev}
     ]
   end
 
@@ -49,7 +51,8 @@ defmodule ExBisca.MixProject do
       "assets.setup": ["bun.install --if-missing", "bun default install --cwd assets"],
       "assets.build": ["compile", "bun js", "bun css"],
       "assets.deploy": ["bun css --minify", "bun js --minify", "phx.digest"],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
+      "rules.sync": ["usage_rules.sync CLAUDE.md --all --link-to-folder deps --yes"]
     ]
   end
 end

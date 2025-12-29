@@ -19,6 +19,10 @@ defmodule ExBiscaWeb.Endpoint do
     only: ExBiscaWeb.static_paths(),
     raise_on_missing_only: code_reloading?
 
+  if Code.ensure_loaded?(Tidewave) do
+    plug Tidewave
+  end
+
   if code_reloading? do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
