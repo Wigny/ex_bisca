@@ -1,5 +1,5 @@
-defmodule ExBisca.Play.Deck do
-  alias ExBisca.Play.Card
+defmodule ExBisca.Deck do
+  alias ExBisca.Card
 
   @type t :: list(Card.t())
 

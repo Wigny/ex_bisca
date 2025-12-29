@@ -1,6 +1,6 @@
-defmodule ExBisca.Play.CardTest do
+defmodule ExBisca.CardTest do
   use ExUnit.Case
-  alias ExBisca.Play.Card
+  alias ExBisca.Card
 
   describe "captures?/3" do
     setup do

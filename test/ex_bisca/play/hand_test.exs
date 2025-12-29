@@ -1,8 +1,8 @@
-defmodule ExBisca.Play.HandTest do
+defmodule ExBisca.HandTest do
   use ExUnit.Case
-  alias ExBisca.Play.Hand
+  alias ExBisca.Hand
 
-  @deck ExBisca.Play.Deck.new()
+  @deck ExBisca.Deck.new()
 
   describe "deal/2" do
     test "adds cards to a hand" do

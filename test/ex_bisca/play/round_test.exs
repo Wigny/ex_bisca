@@ -1,59 +1,59 @@
-defmodule ExBisca.Play.RoundTest do
+defmodule ExBisca.Round.TrickTest do
   use ExUnit.Case
 
-  alias ExBisca.Play.Card
-  alias ExBisca.Play.Player
-  alias ExBisca.Play.Round
+  alias ExBisca.Card
+  alias ExBisca.Player
+  alias ExBisca.Round.Trick
 
   @player1 Player.new("player1")
   @player2 Player.new("player2")
 
   describe "new/2" do
-    test "creates a new round" do
-      assert %Round{} = round = Round.new([@player1.id, @player2.id])
-      assert round.stack == [{@player1.id, nil}, {@player2.id, nil}]
-      assert round.current_player_id == @player1.id
+    test "creates a new trick" do
+      assert %Trick{} = trick = Trick.new([@player1.id, @player2.id])
+      assert trick.stack == [{@player1.id, nil}, {@player2.id, nil}]
+      assert trick.current_player_id == @player1.id
     end
   end
 
   describe "restart/2" do
-    test "restarts a round with new players ordering" do
-      round = Round.new([@player1.id, @player2.id])
+    test "restarts a trick with new players ordering" do
+      trick = Trick.new([@player1.id, @player2.id])
 
-      assert %Round{} = round = Round.restart(round, @player2.id)
-      assert round.stack == [{@player2.id, nil}, {@player1.id, nil}]
+      assert %Trick{} = trick = Trick.restart(trick, @player2.id)
+      assert trick.stack == [{@player2.id, nil}, {@player1.id, nil}]
     end
   end
 
   describe "move/3" do
     setup do
-      round = Round.new([@player1.id, @player2.id])
-      %{round: round}
+      trick = Trick.new([@player1.id, @player2.id])
+      %{trick: trick}
     end
 
-    test "stores a player movement", %{round: round} do
+    test "stores a player movement", %{trick: trick} do
       card = Card.new(:spades, :ace)
 
-      assert %Round{stack: stack} = Round.move(round, @player1.id, card)
+      assert %Trick{stack: stack} = Trick.move(trick, @player1.id, card)
       assert stack == [{@player1.id, card}, {@player2.id, nil}]
     end
 
-    test "updates the current player as the next player", %{round: round} do
+    test "updates the current player as the next player", %{trick: trick} do
       card1 = Card.new(:spades, :ace)
       card2 = Card.new(:spades, :king)
 
-      round = Round.move(round, @player1.id, card1)
-      assert round.current_player_id == @player2.id
+      trick = Trick.move(trick, @player1.id, card1)
+      assert trick.current_player_id == @player2.id
 
-      round = Round.move(round, @player2.id, card2)
-      assert round.current_player_id == nil
+      trick = Trick.move(trick, @player2.id, card2)
+      assert trick.current_player_id == nil
     end
 
-    test "raises an errors if it's not the player turn", %{round: round} do
+    test "raises an errors if it's not the player turn", %{trick: trick} do
       card = Card.new(:spades, :ace)
 
       assert_raise RuntimeError, fn ->
-        Round.move(round, @player2.id, card)
+        Trick.move(trick, @player2.id, card)
       end
     end
   end
@@ -64,13 +64,13 @@ defmodule ExBisca.Play.RoundTest do
       king = Card.new(:spades, :king)
       trump = Card.new(:hearts, 2)
 
-      round =
+      trick =
         [@player1.id, @player2.id]
-        |> Round.new()
-        |> Round.move(@player1.id, king)
-        |> Round.move(@player2.id, ace)
+        |> Trick.new()
+        |> Trick.move(@player1.id, king)
+        |> Trick.move(@player2.id, ace)
 
-      assert @player2.id == Round.winner_id(round, trump)
+      assert @player2.id == Trick.winner_id(trick, trump)
     end
   end
 
@@ -79,13 +79,13 @@ defmodule ExBisca.Play.RoundTest do
       ace = Card.new(:spades, :ace)
       king = Card.new(:spades, :king)
 
-      round =
+      trick =
         [@player1.id, @player2.id]
-        |> Round.new()
-        |> Round.move(@player1.id, king)
-        |> Round.move(@player2.id, ace)
+        |> Trick.new()
+        |> Trick.move(@player1.id, king)
+        |> Trick.move(@player2.id, ace)
 
-      assert ace.score + king.score == Round.score(round)
+      assert ace.score + king.score == Trick.score(trick)
     end
   end
 
@@ -93,13 +93,13 @@ defmodule ExBisca.Play.RoundTest do
     test "returns whether all players have played" do
       ace = Card.new(:spades, :ace)
       king = Card.new(:spades, :king)
-      round = Round.new([@player1.id, @player2.id])
+      trick = Trick.new([@player1.id, @player2.id])
 
-      round = Round.move(round, @player1.id, king)
-      refute Round.complete?(round)
+      trick = Trick.move(trick, @player1.id, king)
+      refute Trick.complete?(trick)
 
-      round = Round.move(round, @player2.id, ace)
-      assert Round.complete?(round)
+      trick = Trick.move(trick, @player2.id, ace)
+      assert Trick.complete?(trick)
     end
   end
 end

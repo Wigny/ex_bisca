@@ -1,4 +1,4 @@
-defmodule ExBisca.Play.Player do
+defmodule ExBisca.Player do
   @type id :: binary
   @type t :: %__MODULE__{id: id, name: binary}
 

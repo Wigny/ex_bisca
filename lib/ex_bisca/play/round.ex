@@ -1,6 +1,6 @@
-defmodule ExBisca.Play.Round do
-  alias ExBisca.Play.Card
-  alias ExBisca.Play.Player
+defmodule ExBisca.Round.Trick do
+  alias ExBisca.Card
+  alias ExBisca.Player
 
   @type player_id :: Player.id()
   @type card :: Card.t()
@@ -22,9 +22,9 @@ defmodule ExBisca.Play.Round do
     }
   end
 
-  @spec restart(round :: t, next_player_id :: player_id) :: t
-  def restart(round, next_player_id) do
-    player_ids = Enum.map(round.stack, fn {player_id, _card} -> player_id end)
+  @spec restart(trick :: t, next_player_id :: player_id) :: t
+  def restart(trick, next_player_id) do
+    player_ids = Enum.map(trick.stack, fn {player_id, _card} -> player_id end)
     next_player_index = Enum.find_index(player_ids, &(&1 == next_player_id))
 
     player_ids
@@ -32,34 +32,34 @@ defmodule ExBisca.Play.Round do
     |> new()
   end
 
-  @spec move(round :: t, player_id, card) :: t
-  def move(round, player_id, card) do
-    if player_id == round.current_player_id do
-      stack = List.keystore(round.stack, player_id, 0, {player_id, card})
+  @spec move(trick :: t, player_id, card) :: t
+  def move(trick, player_id, card) do
+    if player_id == trick.current_player_id do
+      stack = List.keystore(trick.stack, player_id, 0, {player_id, card})
 
       next_player_id =
         Enum.find_value(stack, nil, fn {player_id, card} -> is_nil(card) && player_id end)
 
-      %{round | stack: stack, current_player_id: next_player_id}
+      %{trick | stack: stack, current_player_id: next_player_id}
     else
       raise "it's not that player_id's turn to move"
     end
   end
 
-  @spec winner_id(round :: t, trump :: card) :: player_id
-  def winner_id(round, trump) do
-    round.stack
+  @spec winner_id(trick :: t, trump :: card) :: player_id
+  def winner_id(trick, trump) do
+    trick.stack
     |> Enum.max_by(fn {_player_id, card} -> card end, &Card.captures?(&1, &2, trump))
     |> then(fn {player_id, _card} -> player_id end)
   end
 
-  @spec score(round :: t) :: number
-  def score(round) do
-    Enum.sum_by(round.stack, fn {_player_id, card} -> card.score end)
+  @spec score(trick :: t) :: number
+  def score(trick) do
+    Enum.sum_by(trick.stack, fn {_player_id, card} -> card.score end)
   end
 
-  @spec complete?(round :: t) :: boolean
-  def complete?(round) do
-    Enum.all?(round.stack, fn {_player_id, card} -> not is_nil(card) end)
+  @spec complete?(trick :: t) :: boolean
+  def complete?(trick) do
+    Enum.all?(trick.stack, fn {_player_id, card} -> not is_nil(card) end)
   end
 end

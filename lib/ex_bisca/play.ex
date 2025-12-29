@@ -1,21 +1,22 @@
-defmodule ExBisca.Play do
-  alias ExBisca.Play.{Card, Deck, Hand, Player, Round}
+defmodule ExBisca.Round do
+  alias ExBisca.{Card, Deck, Hand, Player}
+  alias ExBisca.Round.Trick
 
   @type player :: Player.t()
   @type player_id :: Player.id()
   @type card :: Card.t()
   @type hand :: Hand.t()
   @type deck :: Deck.t()
-  @type round :: Round.t()
+  @type trick :: Trick.t()
   @type t :: %__MODULE__{
           deck: deck,
           trump: card,
           player_ids: list(player_id),
           hands: %{player_id => hand},
-          round: round
+          trick: trick
         }
 
-  defstruct [:deck, :trump, :round, :player_ids, :hands]
+  defstruct [:deck, :trump, :trick, :player_ids, :hands]
 
   @spec start(player_ids :: list(player_id)) :: t
   def start(player_ids) do
@@ -25,58 +26,58 @@ defmodule ExBisca.Play do
     %__MODULE__{deck: deck, player_ids: player_ids, hands: hands}
     |> deal_players_cards(3)
     |> turn_up_trump()
-    |> start_first_round()
+    |> start_first_trick()
   end
 
-  defp deal_players_cards(play, count) do
-    Enum.reduce(play.hands, play, fn {player_id, hand}, play ->
-      {cards, deck} = Deck.draw(play.deck, count)
+  defp deal_players_cards(round, count) do
+    Enum.reduce(round.hands, round, fn {player_id, hand}, round ->
+      {cards, deck} = Deck.draw(round.deck, count)
 
-      %{play | deck: deck, hands: %{play.hands | player_id => Hand.deal(hand, cards)}}
+      %{round | deck: deck, hands: %{round.hands | player_id => Hand.deal(hand, cards)}}
     end)
   end
 
-  defp turn_up_trump(play) do
-    trump = List.last(play.deck)
+  defp turn_up_trump(round) do
+    trump = List.last(round.deck)
 
-    %{play | trump: trump}
+    %{round | trump: trump}
   end
 
-  defp start_first_round(play) do
-    %{play | round: Round.new(play.player_ids)}
+  defp start_first_trick(round) do
+    %{round | trick: Trick.new(round.player_ids)}
   end
 
-  @spec move(play :: t, player_id, card) :: t
-  def move(play, player_id, card) do
-    play
+  @spec move(round :: t, player_id, card) :: t
+  def move(round, player_id, card) do
+    round
     |> move_player_card(player_id, card)
     |> prepare_next_move()
   end
 
-  defp move_player_card(play, player_id, card) do
-    hand = Hand.drop(play.hands[player_id], card)
-    round = Round.move(play.round, player_id, card)
+  defp move_player_card(round, player_id, card) do
+    hand = Hand.drop(round.hands[player_id], card)
+    trick = Trick.move(round.trick, player_id, card)
 
-    %{play | hands: %{play.hands | player_id => hand}, round: round}
+    %{round | hands: %{round.hands | player_id => hand}, trick: trick}
   end
 
-  defp prepare_next_move(play) do
-    if Round.complete?(play.round) do
-      prepare_next_round(play)
+  defp prepare_next_move(round) do
+    if Trick.complete?(round.trick) do
+      prepare_next_trick(round)
     else
-      play
+      round
     end
   end
 
-  defp prepare_next_round(play) do
-    round_winner_id = Round.winner_id(play.round, play.trump)
-    round_score = Round.score(play.round)
+  defp prepare_next_trick(round) do
+    trick_winner_id = Trick.winner_id(round.trick, round.trump)
+    trick_score = Trick.score(round.trick)
 
-    winner_hand = Hand.increase_score(play.hands[round_winner_id], round_score)
+    winner_hand = Hand.increase_score(round.hands[trick_winner_id], trick_score)
 
-    round = Round.restart(play.round, round_winner_id)
-    hands = %{play.hands | round_winner_id => winner_hand}
+    trick = Trick.restart(round.trick, trick_winner_id)
+    hands = %{round.hands | trick_winner_id => winner_hand}
 
-    deal_players_cards(%{play | round: round, hands: hands}, 1)
+    deal_players_cards(%{round | trick: trick, hands: hands}, 1)
   end
 end

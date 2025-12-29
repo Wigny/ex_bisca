@@ -5,7 +5,7 @@ defmodule ExBiscaWeb.UserLiveAuth do
   import Phoenix.LiveView
 
   def on_mount(:ensure_authenticated, _params, %{"username" => username}, socket) do
-    {:cont, assign_new(socket, :player, fn -> ExBisca.Play.Player.new(username) end)}
+    {:cont, assign_new(socket, :player, fn -> ExBisca.Player.new(username) end)}
   end
 
   def on_mount(:ensure_authenticated, _params, _session, socket) do

@@ -2,8 +2,7 @@ defmodule ExBisca.Game do
   use GenServer
 
   alias ExBisca.GameRegistry
-  alias ExBisca.Play
-  alias ExBisca.Play.{Card, Player}
+  alias ExBisca.{Card, Player, Round}
   alias Phoenix.PubSub
 
   # Client
@@ -26,16 +25,16 @@ defmodule ExBisca.Game do
 
   @impl true
   def init(%{game_id: game_id, player_ids: player_ids}) do
-    play = Play.start(player_ids)
+    round = Round.start(player_ids)
 
-    {:ok, %{game_id: game_id, play: play}}
+    {:ok, %{game_id: game_id, round: round}}
   end
 
   @impl true
   def handle_cast({:move, %Player{} = player, %Card{} = card}, state) do
-    play = Play.move(state.play, player.id, card)
+    round = Round.move(state.round, player.id, card)
 
-    {:noreply, %{state | play: play}}
+    {:noreply, %{state | round: round}}
   end
 
   defp broadcast(game_id, message) do

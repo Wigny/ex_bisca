@@ -1,4 +1,4 @@
-defmodule ExBisca.Play.Card do
+defmodule ExBisca.Card do
   @type rank :: 2 | 3 | 4 | 5 | 6 | 7 | :queen | :jack | :king | :ace
   @type suit :: :spades | :hearts | :diamonds | :clubs
   @type score :: 0 | 2 | 3 | 4 | 10 | 11
