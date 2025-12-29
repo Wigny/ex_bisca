@@ -12,6 +12,7 @@ defmodule ExBisca.CardTest do
       assert Card.captures?(Card.new(:spades, :king), Card.new(:spades, 6), trump)
       assert Card.captures?(Card.new(:hearts, :ace), Card.new(:hearts, 7), trump)
       refute Card.captures?(Card.new(:clubs, :jack), Card.new(:clubs, 7), trump)
+      refute Card.captures?(Card.new(:hearts, 2), Card.new(:hearts, :ace), trump)
     end
 
     test "checks when the cards are of different suits and there is no trump between them",
@@ -26,6 +27,7 @@ defmodule ExBisca.CardTest do
       assert Card.captures?(Card.new(trump.suit, 2), Card.new(:clubs, 3), trump)
       refute Card.captures?(Card.new(:spades, 7), Card.new(trump.suit, 2), trump)
       assert Card.captures?(Card.new(trump.suit, 5), Card.new(:spades, 6), trump)
+      refute Card.captures?(Card.new(:spades, :king), Card.new(trump.suit, 2), trump)
     end
   end
 end

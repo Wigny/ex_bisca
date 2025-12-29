@@ -9,9 +9,29 @@ defmodule ExBisca.RoundTest do
   @player1 Player.new("player1")
   @player2 Player.new("player2")
 
+  describe "join/2" do
+    test "adds a player to a new round" do
+      assert %Round{player_ids: player_ids} = Round.join(@player1.id)
+      assert player_ids == [@player1.id]
+    end
+
+    test "adds a player to an existing round" do
+      round = Round.join(@player1.id)
+
+      assert %Round{player_ids: player_ids} = Round.join(round, @player2.id)
+      assert player_ids == [@player1.id, @player2.id]
+    end
+  end
+
   describe "start/2" do
-    test "setup a new round" do
-      assert %Round{} = round = Round.start([@player1.id, @player2.id])
+    setup do
+      round = Round.join(@player1.id)
+      round = Round.join(round, @player2.id)
+      %{round: round}
+    end
+
+    test "starts a round", %{round: round} do
+      assert %Round{} = round = Round.start(round)
       assert length(round.hands[@player1.id].cards) == 3
       assert length(round.hands[@player2.id].cards) == 3
       assert length(round.deck) == 34
@@ -23,7 +43,10 @@ defmodule ExBisca.RoundTest do
     setup do
       :rand.seed(:exsss, {100, 101, 102})
 
-      %{round: Round.start([@player1.id, @player2.id])}
+      round = Round.join(@player1.id)
+      round = Round.join(round, @player2.id)
+
+      %{round: Round.start(round)}
     end
 
     test "moves card from player's hand", %{round: round} do
@@ -61,6 +84,50 @@ defmodule ExBisca.RoundTest do
         |> Round.move(@player2.id, hd(round.hands[@player2.id].cards))
 
       assert round.trick.current_player_id == @player1.id
+    end
+
+    test "completes the round after all cards are played", %{round: round} do
+      round =
+        Enum.reduce(1..40, round, fn _move_num, round ->
+          player_id = round.trick.current_player_id
+
+          Round.move(round, player_id, hd(round.hands[player_id].cards))
+        end)
+
+      assert Round.complete?(round)
+    end
+  end
+
+  describe "winner_id/1" do
+    setup do
+      round = Round.join(@player1.id)
+      round = Round.join(round, @player2.id)
+
+      %{round: Round.start(round)}
+    end
+
+    test "returns the player with the highest score", %{round: round} do
+      round = %{
+        round
+        | hands: %{
+            @player1.id => %ExBisca.Hand{cards: [], score: 68},
+            @player2.id => %ExBisca.Hand{cards: [], score: 52}
+          }
+      }
+
+      assert Round.winner_id(round) == @player1.id
+    end
+
+    test "returns nil when there is a draw", %{round: round} do
+      round = %{
+        round
+        | hands: %{
+            @player1.id => %ExBisca.Hand{cards: [], score: 60},
+            @player2.id => %ExBisca.Hand{cards: [], score: 60}
+          }
+      }
+
+      assert Round.winner_id(round) == nil
     end
   end
 end

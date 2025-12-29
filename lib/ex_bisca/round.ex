@@ -9,27 +9,34 @@ defmodule ExBisca.Round do
   @type deck :: Deck.t()
   @type trick :: Trick.t()
   @type t :: %__MODULE__{
-          deck: deck,
-          trump: card,
+          deck: deck | nil,
+          trump: card | nil,
           player_ids: list(player_id),
-          hands: %{player_id => hand},
-          trick: trick
+          hands: %{player_id => hand} | nil,
+          trick: trick | nil
         }
 
-  defstruct [:deck, :trump, :trick, :player_ids, :hands]
+  defstruct [:deck, :trump, :trick, :hands, player_ids: []]
 
-  @spec start(player_ids :: list(player_id)) :: t
-  def start(player_ids) do
+  @max_players 2
+
+  @spec join(round :: t, player_id) :: t
+  def join(round \\ %__MODULE__{}, player_id) when length(round.player_ids) < @max_players do
+    %{round | player_ids: round.player_ids ++ [player_id]}
+  end
+
+  @spec start(round :: t) :: t
+  def start(%__MODULE__{} = round) when length(round.player_ids) == @max_players do
     deck = Deck.new()
-    hands = Map.from_keys(player_ids, Hand.new())
+    hands = Map.from_keys(round.player_ids, Hand.new())
 
-    %__MODULE__{deck: deck, player_ids: player_ids, hands: hands}
-    |> deal_players_cards(3)
+    %{round | deck: deck, hands: hands}
+    |> deal_cards(3)
     |> turn_up_trump()
     |> start_first_trick()
   end
 
-  defp deal_players_cards(round, count) do
+  defp deal_cards(round, count) do
     Enum.reduce(round.hands, round, fn {player_id, hand}, round ->
       {cards, deck} = Deck.draw(round.deck, count)
 
@@ -52,6 +59,21 @@ defmodule ExBisca.Round do
     round
     |> move_player_card(player_id, card)
     |> prepare_next_move()
+  end
+
+  @spec complete?(round :: t) :: boolean
+  def complete?(round) do
+    Enum.empty?(round.deck) and
+      Enum.all?(round.hands, fn {_player_id, hand} -> Enum.empty?(hand.cards) end)
+  end
+
+  @winner_score 60
+
+  @spec winner_id(round :: t) :: player_id | nil
+  def winner_id(round) do
+    Enum.find_value(round.hands, fn {player_id, hand} ->
+      if hand.score > @winner_score, do: player_id
+    end)
   end
 
   defp move_player_card(round, player_id, card) do
@@ -78,6 +100,6 @@ defmodule ExBisca.Round do
     trick = Trick.restart(round.trick, trick_winner_id)
     hands = %{round.hands | trick_winner_id => winner_hand}
 
-    deal_players_cards(%{round | trick: trick, hands: hands}, 1)
+    deal_cards(%{round | trick: trick, hands: hands}, 1)
   end
 end

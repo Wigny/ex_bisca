@@ -19,6 +19,9 @@ defmodule ExBisca.Card do
   defp score(:queen), do: 2
   defp score(rank) when rank in 2..6, do: 0
 
+  @doc """
+  Checks if the first card captures the second one considering the given trump.
+  """
   @spec captures?(t, t, t) :: boolean
   def captures?(%{score: 0, suit: suit} = card1, %{score: 0, suit: suit} = card2, _trump) do
     card1.rank > card2.rank
